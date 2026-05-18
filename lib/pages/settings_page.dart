@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:android_intent_plus/android_intent.dart';
+import 'dart:io';
+import 'package:wellnest/providers/health_permission_provider.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final permissionAsync = ref.watch(healthPermissionProvider);
 
-class _SettingsPageState extends State<SettingsPage> {
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -69,16 +71,51 @@ class _SettingsPageState extends State<SettingsPage> {
                                       context,
                                     ).textTheme.labelMedium,
                                   ),
-                                  Text(
-                                    "connected",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelSmall!
-                                        .copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                        ),
+
+                                  permissionAsync.when(
+                                    data: (granted) {
+                                      if (granted) {
+                                        return Text(
+                                          "connected",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall!
+                                              .copyWith(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                              ),
+                                        );
+                                      }
+
+                                      return Text(
+                                        "disconnected",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall!
+                                            .copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.error,
+                                            ),
+                                      );
+                                    },
+                                    loading: () {
+                                      return Text(
+                                        "loading...",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall!
+                                            .copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.outline,
+                                            ),
+                                      );
+                                    },
+                                    error: (error, stackTrace) {
+                                      return Text('Error: $error');
+                                    },
                                   ),
                                 ],
                               ),
@@ -100,7 +137,45 @@ class _SettingsPageState extends State<SettingsPage> {
                           SizedBox(
                             width: double.infinity,
                             child: FilledButton(
-                              onPressed: () {},
+                              onPressed: () async {
+                                if (!Platform.isAndroid) return;
+
+                                try {
+                                  // Android 14+ Health Connect permission management
+                                  const managePermissionIntent = AndroidIntent(
+                                    action:
+                                        'android.health.connect.action.MANAGE_HEALTH_PERMISSIONS',
+                                    arguments: {
+                                      'android.intent.extra.PACKAGE_NAME':
+                                          'com.example.wellnest',
+                                    },
+                                  );
+
+                                  await managePermissionIntent.launch();
+                                } on PlatformException {
+                                  try {
+                                    // Android 13 and lower Health Connect app/settings
+                                    const healthConnectSettingsIntent = AndroidIntent(
+                                      action:
+                                          'androidx.health.ACTION_HEALTH_CONNECT_SETTINGS',
+                                      package:
+                                          'com.google.android.apps.healthdata',
+                                    );
+
+                                    await healthConnectSettingsIntent.launch();
+                                  } on PlatformException {
+                                    // Normal Android app settings fallback
+                                    const appSettingsIntent = AndroidIntent(
+                                      action:
+                                          'android.settings.APPLICATION_DETAILS_SETTINGS',
+                                      data: 'package:com.example.wellnest',
+                                    );
+
+                                    await appSettingsIntent.launch();
+                                  }
+                                }
+                              },
+
                               style: FilledButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
@@ -109,24 +184,26 @@ class _SettingsPageState extends State<SettingsPage> {
                               child: const Text('Manage Permissions'),
                             ),
                           ),
-                          SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: FilledButton(
-                              onPressed: () {},
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer
-                                      .withValues(alpha: 0.2),
-                                foregroundColor: Theme.of(context).colorScheme.primary,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                              ),
-                              child: const Text('Sync Now'),
-                            ),
-                          ),
+                          // SizedBox(height: 12),
+                          // SizedBox(
+                          //   width: double.infinity,
+                          //   child: FilledButton(
+                          //     onPressed: () {},
+                          //     style: FilledButton.styleFrom(
+                          //       backgroundColor: Theme.of(context)
+                          //           .colorScheme
+                          //           .primaryContainer
+                          //           .withValues(alpha: 0.2),
+                          //       foregroundColor: Theme.of(
+                          //         context,
+                          //       ).colorScheme.primary,
+                          //       padding: const EdgeInsets.symmetric(
+                          //         vertical: 12,
+                          //       ),
+                          //     ),
+                          //     child: const Text('Sync Now'),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ],
