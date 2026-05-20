@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wellnest/pages/settings_page.dart';
+import 'package:wellnest/views/bottom_nav.dart';
 import 'package:wellnest/services/health_service.dart';
 import 'package:wellnest/theme/app_theme.dart';
 
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: SettingsPage(),
+      home: BottomNav(),
     );
   }
 }
