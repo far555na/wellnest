@@ -112,4 +112,24 @@ class HealthService {
 
     return totalCalories;
   }
+
+  Future<Duration> getTodaySleep() async {
+    final now = DateTime.now();
+
+    final startOfDay = DateTime(now.year, now.month, now.day);
+
+    final data = await health.getHealthDataFromTypes(
+      types: [HealthDataType.SLEEP_ASLEEP],
+      startTime: startOfDay,
+      endTime: now,
+    );
+
+    Duration totalSleep = Duration.zero;
+
+    for (final point in data) {
+      totalSleep += point.dateTo.difference(point.dateFrom);
+    }
+
+    return totalSleep;
+  }
 }

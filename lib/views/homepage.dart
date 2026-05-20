@@ -13,6 +13,7 @@ class Homepage extends ConsumerWidget {
     final stepsAsync = ref.watch(todayStepsProvider);
     final heartRateAsync = ref.watch(latestHeartRateProvider);
     final caloriesAsync = ref.watch(todayCaloriesProvider);
+    final sleepAsync = ref.watch(todaySleepProvider);
 
     return Scaffold(
       appBar: AppBar(),
@@ -22,22 +23,49 @@ class Homepage extends ConsumerWidget {
           child: Column(
             spacing: 16,
             children: [
-              stepsAsync.when(
-                data: (steps) {
-                  return HealthStatCard(
-                    label: 'STEPS',
-                    value: steps.toString(),
-                    unit: 'steps',
-                    icon: Symbols.footprint,
-                    trend: "+12%",
-                  );
-                },
-                loading: () {
-                  return const Center(child: CircularProgressIndicator());
-                },
-                error: (error, stackTrace) {
-                  return Text('Error: $error');
-                },
+              Row(
+                spacing: 16,
+                children: [
+                  Expanded(
+                    child: stepsAsync.when(
+                      data: (steps) {
+                        return HealthStatCard(
+                          label: 'STEPS',
+                          value: steps.toString(),
+                          unit: 'steps',
+                          icon: Symbols.footprint,
+                          trend: "+12%",
+                        );
+                      },
+                      loading: () {
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                      error: (error, stackTrace) {
+                        return Text('Error: $error');
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: sleepAsync.when(
+                      data: (sleep) {
+                        return HealthStatCard(
+                          label: 'SLEEP',
+                          value: formatSleep(sleep),
+                          icon: Icons.nightlight,
+                          iconColor: theme.colorScheme.secondary,
+                          trend: '-5%',
+                          trendColor: theme.colorScheme.error,
+                        );
+                      },
+                      loading: () {
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                      error: (error, stackTrace) {
+                        return Text('Error: $error');
+                      },
+                    ),
+                  ),
+                ],
               ),
               heartRateAsync.when(
                 data: (heartRate) {
@@ -82,4 +110,11 @@ class Homepage extends ConsumerWidget {
       ),
     );
   }
+}
+
+String formatSleep(Duration duration) {
+  final hours = duration.inHours;
+  final minutes = duration.inMinutes.remainder(60);
+
+  return '${hours}h ${minutes}m';
 }

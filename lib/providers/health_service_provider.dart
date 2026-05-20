@@ -58,3 +58,15 @@ final todayCaloriesProvider = FutureProvider<double>((ref) async {
 
   return service.getTodayCalories();
 });
+
+final todaySleepProvider = FutureProvider<Duration>((ref) async {
+  final service = ref.read(healthServiceProvider);
+
+  final granted = await ref.watch(healthPermissionProvider.future);
+
+  if (!granted) {
+    return Duration.zero;
+  }
+
+  return service.getTodaySleep();
+});
