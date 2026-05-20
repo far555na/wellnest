@@ -11,62 +11,57 @@ final healthPermissionProvider = FutureProvider<bool>((ref) async {
   return service.initHealth();
 });
 
-final todayStepsProvider = FutureProvider<int>((ref) async {
+Future<T> _withHealthPermission<T>(
+  Ref ref, {
+  required T fallback,
+  required Future<T> Function(HealthService service) action,
+}) async {
   final service = ref.read(healthServiceProvider);
-
   final granted = await ref.watch(healthPermissionProvider.future);
 
   if (!granted) {
-    return 0;
+    return fallback;
   }
 
-  return service.getTodaySteps();
+  return action(service);
+}
+
+final todayStepsProvider = FutureProvider<int>((ref) {
+  return _withHealthPermission<int>(
+    ref,
+    fallback: 0,
+    action: (service) => service.getTodaySteps(),
+  );
 });
 
-final healthDataProvider = FutureProvider<List<HealthDataPoint>>((ref) async {
-  final service = ref.read(healthServiceProvider);
-
-  final granted = await ref.watch(healthPermissionProvider.future);
-
-  if (!granted) {
-    return [];
-  }
-
-  return service.getHealthData();
+final healthDataProvider = FutureProvider<List<HealthDataPoint>>((ref) {
+  return _withHealthPermission<List<HealthDataPoint>>(
+    ref,
+    fallback: [],
+    action: (service) => service.getHealthData(),
+  );
 });
 
-final latestHeartRateProvider = FutureProvider<double?>((ref) async {
-  final service = ref.read(healthServiceProvider);
-
-  final granted = await ref.watch(healthPermissionProvider.future);
-
-  if (!granted) {
-    return null;
-  }
-
-  return service.getLatestHeartRate();
+final latestHeartRateProvider = FutureProvider<double?>((ref) {
+  return _withHealthPermission<double?>(
+    ref,
+    fallback: null,
+    action: (service) => service.getLatestHeartRate(),
+  );
 });
 
-final todayCaloriesProvider = FutureProvider<double>((ref) async {
-  final service = ref.read(healthServiceProvider);
-
-  final granted = await ref.watch(healthPermissionProvider.future);
-
-  if (!granted) {
-    return 0;
-  }
-
-  return service.getTodayCalories();
+final todayCaloriesProvider = FutureProvider<double>((ref) {
+  return _withHealthPermission<double>(
+    ref,
+    fallback: 0,
+    action: (service) => service.getTodayCalories(),
+  );
 });
 
-final todaySleepProvider = FutureProvider<Duration>((ref) async {
-  final service = ref.read(healthServiceProvider);
-
-  final granted = await ref.watch(healthPermissionProvider.future);
-
-  if (!granted) {
-    return Duration.zero;
-  }
-
-  return service.getTodaySleep();
+final todaySleepProvider = FutureProvider<Duration>((ref) {
+  return _withHealthPermission<Duration>(
+    ref,
+    fallback: Duration.zero,
+    action: (service) => service.getTodaySleep(),
+  );
 });
