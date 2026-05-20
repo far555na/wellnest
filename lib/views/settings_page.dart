@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'dart:io';
 import 'package:wellnest/providers/health_service_provider.dart';
+import 'package:wellnest/widgets/profile_info_card.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -20,6 +21,34 @@ class SettingsPage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                "PERSONAL PROFILE",
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+              SizedBox(height: 16),
+
+        Column(
+  children: [
+    Row(
+      children: [
+        Expanded(child: ProfileInfoCard(label: "Gender", value: "Female", icon: Icons.person_outline)),
+        const SizedBox(width: 16),
+        Expanded(child: ProfileInfoCard(label: "Age", value: "21", icon: Icons.cake_outlined)),
+      ],
+    ),
+    const SizedBox(height: 16),
+    Row(
+      children: [
+        Expanded(child: ProfileInfoCard(label: "Height", value: "165 cm", icon: Icons.straighten)),
+        const SizedBox(width: 16),
+        Expanded(child: ProfileInfoCard(label: "Weight", value: "52 kg", icon: Icons.monitor_weight_outlined)),
+      ],
+    ),
+  ],
+),
+
+              SizedBox(height: 48),
+
               Text(
                 "CONNECTION",
                 style: Theme.of(context).textTheme.labelMedium,
