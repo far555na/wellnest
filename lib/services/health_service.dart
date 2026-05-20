@@ -2,126 +2,97 @@ import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HealthService {
-  final Health health = Health();
+  final Health _health = Health();
 
-  final List<HealthDataType> types = [
+  final List<HealthDataType> _types = const [
     HealthDataType.STEPS,
     HealthDataType.HEART_RATE,
     HealthDataType.SLEEP_ASLEEP,
     HealthDataType.ACTIVE_ENERGY_BURNED,
   ];
 
+  List<HealthDataAccess> get _permissions {
+    return _types.map((_) => HealthDataAccess.READ).toList();
+  }
+
+  DateTime get _now => DateTime.now();
+
+  DateTime get _startOfToday {
+    final now = _now;
+    return DateTime(now.year, now.month, now.day);
+  }
+
+  DateTime get _yesterday {
+    return _now.subtract(const Duration(days: 1));
+  }
+
   Future<bool> initHealth() async {
-    // For steps permission on Android
     await Permission.activityRecognition.request();
 
-    await health.configure();
+    await _health.configure();
 
-    final types = [
-      HealthDataType.STEPS,
-      HealthDataType.HEART_RATE,
-      HealthDataType.SLEEP_ASLEEP,
-      HealthDataType.ACTIVE_ENERGY_BURNED,
-    ];
-
-    final permissions = [
-      HealthDataAccess.READ,
-      HealthDataAccess.READ,
-      HealthDataAccess.READ,
-      HealthDataAccess.READ,
-    ];
-
-    final granted = await health.requestAuthorization(
-      types,
-      permissions: permissions,
+    final granted = await _health.requestAuthorization(
+      _types,
+      permissions: _permissions,
     );
 
     return granted;
   }
 
   Future<int> getTodaySteps() async {
-    final now = DateTime.now();
-    final midnight = DateTime(now.year, now.month, now.day);
-
-    final steps = await health.getTotalStepsInInterval(midnight, now);
+    final steps = await _health.getTotalStepsInInterval(
+      _startOfToday,
+      _now,
+    );
 
     return steps ?? 0;
   }
 
   Future<List<HealthDataPoint>> getHealthData() async {
-    final now = DateTime.now();
-    final yesterday = now.subtract(const Duration(days: 1));
-
-    final data = await health.getHealthDataFromTypes(
-      types: types,
-      startTime: yesterday,
-      endTime: now,
+    final data = await _health.getHealthDataFromTypes(
+      types: _types,
+      startTime: _yesterday,
+      endTime: _now,
     );
 
-    return health.removeDuplicates(data);
+    return _health.removeDuplicates(data);
   }
 
   Future<double?> getLatestHeartRate() async {
-    await health.configure();
-
-    final now = DateTime.now();
-    final startTime = now.subtract(const Duration(days: 1));
-
-    final data = await health.getHealthDataFromTypes(
+    final data = await _health.getHealthDataFromTypes(
       types: [HealthDataType.HEART_RATE],
-      startTime: startTime,
-      endTime: now,
+      startTime: _yesterday,
+      endTime: _now,
     );
 
-    if (data.isEmpty) {
-      return null;
-    }
+    if (data.isEmpty) return null;
 
     data.sort((a, b) => b.dateTo.compareTo(a.dateTo));
 
-    final latest = data.first;
-
-    final value = latest.value;
-
-    if (value is NumericHealthValue) {
-      return value.numericValue.toDouble();
-    }
-
-    return null;
+    return _getNumericValue(data.first);
   }
 
   Future<double> getTodayCalories() async {
-    final now = DateTime.now();
-    final startOfDay = DateTime(now.year, now.month, now.day);
-
-    final data = await health.getHealthDataFromTypes(
+    final data = await _health.getHealthDataFromTypes(
       types: [HealthDataType.ACTIVE_ENERGY_BURNED],
-      startTime: startOfDay,
-      endTime: now,
+      startTime: _startOfToday,
+      endTime: _now,
     );
 
     double totalCalories = 0;
 
     for (final point in data) {
-      final value = point.value;
-
-      if (value is NumericHealthValue) {
-        totalCalories += value.numericValue;
-      }
+      totalCalories += _getNumericValue(point) ?? 0;
     }
 
     return totalCalories;
   }
 
   Future<Duration> getTodaySleep() async {
-    final now = DateTime.now();
-
-    final startOfDay = DateTime(now.year, now.month, now.day);
-
-    final data = await health.getHealthDataFromTypes(
+    final data = await _health.getHealthDataFromTypes(
       types: [HealthDataType.SLEEP_ASLEEP],
-      startTime: startOfDay,
-      endTime: now,
+      startTime: _startOfToday,
+      endTime: _now,
     );
 
     Duration totalSleep = Duration.zero;
@@ -131,5 +102,15 @@ class HealthService {
     }
 
     return totalSleep;
+  }
+
+  double? _getNumericValue(HealthDataPoint point) {
+    final value = point.value;
+
+    if (value is NumericHealthValue) {
+      return value.numericValue.toDouble();
+    }
+
+    return null;
   }
 }
