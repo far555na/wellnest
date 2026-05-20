@@ -36,7 +36,6 @@ class HealthService {
       permissions: permissions,
     );
 
-    print('Health permission granted: $granted');
     return granted;
   }
 
@@ -60,5 +59,34 @@ class HealthService {
     );
 
     return health.removeDuplicates(data);
+  }
+
+  Future<double?> getLatestHeartRate() async {
+    await health.configure();
+
+    final now = DateTime.now();
+    final startTime = now.subtract(const Duration(days: 1));
+
+    final data = await health.getHealthDataFromTypes(
+      types: [HealthDataType.HEART_RATE],
+      startTime: startTime,
+      endTime: now,
+    );
+
+    if (data.isEmpty) {
+      return null;
+    }
+
+    data.sort((a, b) => b.dateTo.compareTo(a.dateTo));
+
+    final latest = data.first;
+
+    final value = latest.value;
+
+    if (value is NumericHealthValue) {
+      return value.numericValue.toDouble();
+    }
+
+    return null;
   }
 }

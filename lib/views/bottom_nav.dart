@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wellnest/views/debug_page.dart';
 import 'package:wellnest/views/homepage.dart';
 import 'package:wellnest/views/settings_page.dart';
 
@@ -14,7 +15,7 @@ class _BottomNavState extends State<BottomNav> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     Homepage(),
-    // Text('Index 1: Business', style: optionStyle),
+    DebugPage(),
     SettingsPage()
   ];
 
@@ -32,10 +33,10 @@ class _BottomNavState extends State<BottomNav> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.business),
-          //   label: 'Business',
-          // ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bug_report),
+            label: 'Debug',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
         currentIndex: _selectedIndex,

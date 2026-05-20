@@ -31,19 +31,18 @@ final healthDataProvider = FutureProvider<List<HealthDataPoint>>((ref) async {
   if (!granted) {
     return [];
   }
-  final data = await service.getHealthData();
-
-  print('Health data count: ${data.length}');
-
-  for (final point in data) {
-    print('----------------------');
-    print('Type: ${point.type}');
-    print('Value: ${point.value}');
-    print('Unit: ${point.unit}');
-    print('Date From: ${point.dateFrom}');
-    print('Date To: ${point.dateTo}');
-    print('Source: ${point.sourceName}');
-  }
 
   return service.getHealthData();
+});
+
+final latestHeartRateProvider = FutureProvider<double?>((ref) async {
+  final service = ref.read(healthServiceProvider);
+
+  final granted = await ref.watch(healthPermissionProvider.future);
+
+  if (!granted) {
+    return null;
+  }
+
+  return service.getLatestHeartRate();
 });

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:wellnest/providers/health_service_provider.dart';
 import 'package:wellnest/widgets/health_stat_card.dart';
 
@@ -10,6 +11,7 @@ class Homepage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ThemeData theme = Theme.of(context);
     final stepsAsync = ref.watch(todayStepsProvider);
+    final heartRateAsync = ref.watch(latestHeartRateProvider);
 
     return Scaffold(
       appBar: AppBar(),
@@ -25,7 +27,7 @@ class Homepage extends ConsumerWidget {
                     label: 'STEPS',
                     value: steps.toString(),
                     unit: 'steps',
-                    icon: Icons.directions_walk,
+                    icon: Symbols.footprint,
                     trend: "+12%",
                   );
                 },
@@ -36,14 +38,24 @@ class Homepage extends ConsumerWidget {
                   return Text('Error: $error');
                 },
               ),
-              HealthStatCard(
-                icon: Icons.favorite,
-                label: "HEART RATE",
-                value: "78",
-                trend: "Avg",
-                unit: "bpm",
-                iconColor: theme.colorScheme.error,
-                trendColor: theme.colorScheme.onSurfaceVariant,
+              heartRateAsync.when(
+                data: (heartRate) {
+                  return HealthStatCard(
+                    label: 'HEART RATE',
+                    value: heartRate?.toStringAsFixed(0) ?? '--',
+                    unit: 'bpm',
+                    icon: Icons.favorite,
+                    iconColor: theme.colorScheme.error,
+                    trendColor: theme.colorScheme.onSurfaceVariant,
+                    trend: 'Avg',
+                  );
+                },
+                loading: () {
+                  return const Center(child: CircularProgressIndicator());
+                },
+                error: (error, stackTrace) {
+                  return Text('Error: $error');
+                },
               ),
             ],
           ),
