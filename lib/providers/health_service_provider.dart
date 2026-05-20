@@ -46,3 +46,15 @@ final latestHeartRateProvider = FutureProvider<double?>((ref) async {
 
   return service.getLatestHeartRate();
 });
+
+final todayCaloriesProvider = FutureProvider<double>((ref) async {
+  final service = ref.read(healthServiceProvider);
+
+  final granted = await ref.watch(healthPermissionProvider.future);
+
+  if (!granted) {
+    return 0;
+  }
+
+  return service.getTodayCalories();
+});

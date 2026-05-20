@@ -8,7 +8,7 @@ class HealthService {
     HealthDataType.STEPS,
     HealthDataType.HEART_RATE,
     HealthDataType.SLEEP_ASLEEP,
-    HealthDataType.TOTAL_CALORIES_BURNED,
+    HealthDataType.ACTIVE_ENERGY_BURNED,
   ];
 
   Future<bool> initHealth() async {
@@ -21,7 +21,7 @@ class HealthService {
       HealthDataType.STEPS,
       HealthDataType.HEART_RATE,
       HealthDataType.SLEEP_ASLEEP,
-      HealthDataType.TOTAL_CALORIES_BURNED,
+      HealthDataType.ACTIVE_ENERGY_BURNED,
     ];
 
     final permissions = [
@@ -88,5 +88,28 @@ class HealthService {
     }
 
     return null;
+  }
+
+  Future<double> getTodayCalories() async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+
+    final data = await health.getHealthDataFromTypes(
+      types: [HealthDataType.ACTIVE_ENERGY_BURNED],
+      startTime: startOfDay,
+      endTime: now,
+    );
+
+    double totalCalories = 0;
+
+    for (final point in data) {
+      final value = point.value;
+
+      if (value is NumericHealthValue) {
+        totalCalories += value.numericValue;
+      }
+    }
+
+    return totalCalories;
   }
 }

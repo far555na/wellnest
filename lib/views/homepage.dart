@@ -12,6 +12,7 @@ class Homepage extends ConsumerWidget {
     ThemeData theme = Theme.of(context);
     final stepsAsync = ref.watch(todayStepsProvider);
     final heartRateAsync = ref.watch(latestHeartRateProvider);
+    final caloriesAsync = ref.watch(todayCaloriesProvider);
 
     return Scaffold(
       appBar: AppBar(),
@@ -48,6 +49,24 @@ class Homepage extends ConsumerWidget {
                     iconColor: theme.colorScheme.error,
                     trendColor: theme.colorScheme.onSurfaceVariant,
                     trend: 'Avg',
+                  );
+                },
+                loading: () {
+                  return const Center(child: CircularProgressIndicator());
+                },
+                error: (error, stackTrace) {
+                  return Text('Error: $error');
+                },
+              ),
+              caloriesAsync.when(
+                data: (calories) {
+                  return HealthStatCard(
+                    label: 'CALORIES',
+                    value: calories.toStringAsFixed(0),
+                    unit: 'kcal',
+                    icon: Icons.local_fire_department,
+                    iconColor: theme.colorScheme.tertiary,
+                    trend: 'On Track',
                   );
                 },
                 loading: () {
