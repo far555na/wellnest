@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wellnest/providers/health_service_provider.dart';
 import 'package:wellnest/widgets/health_stat_card.dart';
 
-class Homepage extends StatefulWidget {
+class Homepage extends ConsumerWidget {
   const Homepage({super.key});
 
   @override
-  State<Homepage> createState() => _HomepageState();
-}
-
-class _HomepageState extends State<Homepage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     ThemeData theme = Theme.of(context);
+    final stepsAsync = ref.watch(todayStepsProvider);
 
     return Scaffold(
       appBar: AppBar(),
@@ -22,13 +19,24 @@ class _HomepageState extends State<Homepage> {
           child: Column(
             spacing: 16,
             children: [
-              HealthStatCard(
-                icon: Symbols.footprint,
-                label: "STEPS",
-                value: "6430",
-                trend: "+12%",
+              stepsAsync.when(
+                data: (steps) {
+                  return HealthStatCard(
+                    label: 'STEPS',
+                    value: steps.toString(),
+                    unit: 'steps',
+                    icon: Icons.directions_walk,
+                    trend: "+12%",
+                  );
+                },
+                loading: () {
+                  return const Center(child: CircularProgressIndicator());
+                },
+                error: (error, stackTrace) {
+                  return Text('Error: $error');
+                },
               ),
-               HealthStatCard(
+              HealthStatCard(
                 icon: Icons.favorite,
                 label: "HEART RATE",
                 value: "78",

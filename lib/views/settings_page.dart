@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'dart:io';
-import 'package:wellnest/providers/health_permission_provider.dart';
+import 'package:wellnest/providers/health_service_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
