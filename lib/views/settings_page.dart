@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:android_intent_plus/android_intent.dart';
+import 'package:wellnest/providers/firestore_service_provider.dart';
 import 'dart:io';
 import 'package:wellnest/providers/health_service_provider.dart';
 import 'package:wellnest/widgets/profile_info_card.dart';
@@ -12,6 +13,7 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final permissionAsync = ref.watch(healthPermissionProvider);
+    final userAsync = ref.watch(userProfileProvider);
 
     return Scaffold(
       appBar: AppBar(),
@@ -26,26 +28,90 @@ class SettingsPage extends ConsumerWidget {
                 style: Theme.of(context).textTheme.labelMedium,
               ),
               SizedBox(height: 16),
+              userAsync.when(
+                loading: () {
+                  return const Center(child: CircularProgressIndicator());
+                },
+                error: (error, stackTrace) {
+                  return Center(child: Text('Error: $error'));
+                },
+                data: (doc) {
+                  if (!doc.exists) {
+                    return const Center(child: Text('No user profile found'));
+                  }
 
-        Column(
-  children: [
-    Row(
-      children: [
-        Expanded(child: ProfileInfoCard(label: "Gender", value: "Female", icon: Icons.person_outline)),
-        const SizedBox(width: 16),
-        Expanded(child: ProfileInfoCard(label: "Age", value: "21", icon: Icons.cake_outlined)),
-      ],
-    ),
-    const SizedBox(height: 16),
-    Row(
-      children: [
-        Expanded(child: ProfileInfoCard(label: "Height", value: "165 cm", icon: Icons.straighten)),
-        const SizedBox(width: 16),
-        Expanded(child: ProfileInfoCard(label: "Weight", value: "52 kg", icon: Icons.monitor_weight_outlined)),
-      ],
-    ),
-  ],
-),
+                  final data = doc.data();
+
+                  if (data == null) {
+                    return const Center(child: Text('No data found'));
+                  }
+
+                  final name = data['name'] ?? '-';
+                  final gender = data['gender'] ?? '-';
+                  final age = data['age'] ?? '-';
+                  final height = data['height'] ?? '-';
+                  final weight = data['weight'] ?? '-';
+
+                  return Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 12,
+                      children: [
+                        Text('Name: $name'),
+                        Text('Gender: $gender'),
+                        Text('Age: $age'),
+                        Text('Height: $height cm'),
+                        Text('Weight: $weight kg'),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ProfileInfoCard(
+                          label: "Gender",
+                          value: "Female",
+                          icon: Icons.person_outline,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ProfileInfoCard(
+                          label: "Age",
+                          value: "21",
+                          icon: Icons.cake_outlined,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ProfileInfoCard(
+                          label: "Height",
+                          value: "165 cm",
+                          icon: Icons.straighten,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ProfileInfoCard(
+                          label: "Weight",
+                          value: "52 kg",
+                          icon: Icons.monitor_weight_outlined,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
 
               SizedBox(height: 48),
 
