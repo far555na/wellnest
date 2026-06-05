@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wellnest/theme/wellnest_theme.dart';
 import 'package:wellnest/views/bottom_nav.dart';
 import 'package:wellnest/services/health_service.dart';
-import 'package:wellnest/theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
