@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wellnest/theme/wellnest_theme.dart';
 import 'package:wellnest/views/bottom_nav.dart';
 import 'package:wellnest/services/health_service.dart';
 import 'package:wellnest/theme/app_theme.dart';
@@ -18,9 +19,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Wellnest',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
+      theme: WellnestTheme.lightTheme,
       home: BottomNav(),
     );
   }
