@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wellnest/views/debug_page.dart';
-import 'package:wellnest/views/homepage.dart';
 import 'package:wellnest/views/settings_page.dart';
+import 'package:wellnest/views/steps_page.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
@@ -11,10 +11,10 @@ class BottomNav extends StatefulWidget {
 }
 
 class _BottomNavState extends State<BottomNav> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 0;
 
   static const List<Widget> _widgetOptions = <Widget>[
-    Homepage(),
+    StepsPage(),
     DebugPage(),
     SettingsPage()
   ];

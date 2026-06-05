@@ -8,7 +8,7 @@ class WellnestTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: WellnestColors.background,
+      scaffoldBackgroundColor: WellnestColors.surface,
 
       colorScheme: const ColorScheme.light(
         surface: WellnestColors.surface,
