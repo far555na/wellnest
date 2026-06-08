@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wellnest/theme/wellnest_theme.dart';
-import 'package:wellnest/views/bottom_nav.dart';
 import 'package:wellnest/services/health_service.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:wellnest/views/steps_page.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       title: 'Wellnest',
       debugShowCheckedModeBanner: false,
       theme: WellnestTheme.lightTheme,
-      home: BottomNav(),
+      home: StepsPage(),
     );
   }
 }
