@@ -68,8 +68,8 @@ class WellnestColors {
   static const Color onTertiaryFixedVariant = Color(0xFF3C4665);
 
   // Activity
-  static const Color activity = Color(0xFFE25822);
-  static const Color activitySurface = Color(0xFFFDF6F3);
+  static const Color activity = Color(0xFF10B981);
+  static const Color activitySurface = Color(0xFFF2FBF8);
   static final Color activityContainer = activity.withValues(alpha: 0.05);
   static final Color activityContainerHigh = activity.withValues(alpha: 0.10);
   static final Color activityContainerHighest = activity.withValues(
@@ -77,15 +77,15 @@ class WellnestColors {
   );
 
   // Heart
-  static const Color heart = Color(0xFFBA1A1A);
-  static const Color heartSurface = Color(0xFFFBF3F3);
+  static const Color heart = Color(0xFFF43F5E);
+  static const Color heartSurface = Color(0xFFFEF5F7);
   static final Color heartContainer = heart.withValues(alpha: 0.05);
   static final Color heartContainerHigh = heart.withValues(alpha: 0.10);
   static final Color heartContainerHighest = heart.withValues(alpha: 0.20);
 
   // Sleep
-  static const Color sleep = Color(0xFF535D7E);
-  static const Color sleepSurface = Color(0xFFF6F6F8);
+  static const Color sleep = Color(0xFF6366F1);
+  static const Color sleepSurface = Color(0xFFF7F7FE);
   static final Color sleepContainer = sleep.withValues(alpha: 0.05);
   static final Color sleepContainerHigh = sleep.withValues(alpha: 0.10);
   static final Color sleepContainerHighest = sleep.withValues(alpha: 0.20);
@@ -95,8 +95,8 @@ class WellnestColors {
   static final Color sleepAwake = sleep.withValues(alpha: 0.40);
 
   // Hydration
-  static const Color hydration = Color(0xFF0EB3C9);
-  static const Color hydrationSurface = Color(0xFFF2FBFC);
+  static const Color hydration = Color(0xFF0EA5E9);
+  static const Color hydrationSurface = Color(0xFFF2FAFE);
   static final Color hydrationContainer = hydration.withValues(alpha: 0.05);
   static final Color hydrationContainerHigh = hydration.withValues(alpha: 0.10);
   static final Color hydrationContainerHighest = hydration.withValues(
@@ -104,7 +104,7 @@ class WellnestColors {
   );
 
   // Body Measurements
-  static const Color measurement = Color(0xFF8B6E4E);
+  static const Color measurement = Color(0xFFA855F7);
   static const Color measurementSurface = Color(0xFFF9F7F6);
   static final Color measurementContainer = measurement.withValues(alpha: 0.05);
   static final Color measurementContainerHigh = measurement.withValues(
@@ -115,8 +115,8 @@ class WellnestColors {
   );
 
   // Vital Signs
-  static const Color vital = Color(0xFFAB274F);
-  static const Color vitalSurface = Color(0xFFFBF4F6);
+  static const Color vital = Color(0xFFF97316);
+  static const Color vitalSurface = Color(0xFFFFF8F3);
   static final Color vitalContainer = vital.withValues(alpha: 0.05);
   static final Color vitalContainerHigh = vital.withValues(alpha: 0.10);
   static final Color vitalContainerHighest = vital.withValues(alpha: 0.20);
