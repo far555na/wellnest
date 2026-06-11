@@ -27,23 +27,23 @@ class WellnestColors {
   static const Color inverseOnSurface = Color(0xFFF2F0F0);
 
   // Primary
-  static const Color primary = Color(0xFF006876);
+  static const Color primary = Color(0xFF14B8A6);
   static const Color onPrimary = Color(0xFFFFFFFF);
-  static const Color primaryContainer = Color(0xFF0EB3C9);
-  static const Color onPrimaryContainer = Color(0xFF004049);
-  static const Color inversePrimary = Color(0xFF51D7EE);
+  static const Color primaryContainer = Color(0xFFD1FAF3);
+  static const Color onPrimaryContainer = Color(0xFF064E47);
+  static const Color inversePrimary = Color(0xFF5EEAD4);
 
   // Secondary
-  static const Color secondary = Color(0xFF4B6267);
+  static const Color secondary = Color(0xFF4A635E);
   static const Color onSecondary = Color(0xFFFFFFFF);
-  static const Color secondaryContainer = Color(0xFFCDE7ED);
-  static const Color onSecondaryContainer = Color(0xFF51686D);
+  static const Color secondaryContainer = Color(0xFFD6F0EA);
+  static const Color onSecondaryContainer = Color(0xFF193B36);
 
   // Tertiary
-  static const Color tertiary = Color(0xFF535D7E);
+  static const Color tertiary = Color(0xFF4E607C);
   static const Color onTertiary = Color(0xFFFFFFFF);
-  static const Color tertiaryContainer = Color(0xFF98A2C6);
-  static const Color onTertiaryContainer = Color(0xFF2E3857);
+  static const Color tertiaryContainer = Color(0xFFD7E3FF);
+  static const Color onTertiaryContainer = Color(0xFF20324F);
 
   // Error
   static const Color error = Color(0xFFBA1A1A);
@@ -52,20 +52,20 @@ class WellnestColors {
   static const Color onErrorContainer = Color(0xFF93000A);
 
   // Fixed colors
-  static const Color primaryFixed = Color(0xFF9FEFFF);
-  static const Color primaryFixedDim = Color(0xFF51D7EE);
-  static const Color onPrimaryFixed = Color(0xFF001F24);
-  static const Color onPrimaryFixedVariant = Color(0xFF004E59);
+  static const Color primaryFixed = Color(0xFFCCFBF1);
+  static const Color primaryFixedDim = Color(0xFF5EEAD4);
+  static const Color onPrimaryFixed = Color(0xFF042F2E);
+  static const Color onPrimaryFixedVariant = Color(0xFF0F766E);
 
-  static const Color secondaryFixed = Color(0xFFCDE7ED);
-  static const Color secondaryFixedDim = Color(0xFFB2CBD0);
-  static const Color onSecondaryFixed = Color(0xFF061F23);
-  static const Color onSecondaryFixedVariant = Color(0xFF334A4F);
+  static const Color secondaryFixed = Color(0xFFD6F0EA);
+  static const Color secondaryFixedDim = Color(0xFFB9D4CE);
+  static const Color onSecondaryFixed = Color(0xFF06201C);
+  static const Color onSecondaryFixedVariant = Color(0xFF334D48);
 
-  static const Color tertiaryFixed = Color(0xFFDBE1FF);
-  static const Color tertiaryFixedDim = Color(0xFFBBC5EB);
-  static const Color onTertiaryFixed = Color(0xFF0F1A37);
-  static const Color onTertiaryFixedVariant = Color(0xFF3C4665);
+  static const Color tertiaryFixed = Color(0xFFD7E3FF);
+  static const Color tertiaryFixedDim = Color(0xFFB8C7E8);
+  static const Color onTertiaryFixed = Color(0xFF081B35);
+  static const Color onTertiaryFixedVariant = Color(0xFF364863);
 
   // Activity
   static const Color activity = Color(0xFF10B981);
