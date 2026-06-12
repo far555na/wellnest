@@ -15,8 +15,8 @@ class _BottomNavState extends State<BottomNav> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     StepsPage(),
-    DebugPage(),
-    SettingsPage()
+    // DebugPage(),
+    // SettingsPage()
   ];
 
   void _onItemTapped(int index) {

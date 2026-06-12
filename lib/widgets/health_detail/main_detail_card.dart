@@ -1,13 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wellnest/providers/activity_service_provider.dart';
 import 'package:wellnest/theme/wellnest_color.dart';
 import 'package:wellnest/theme/wellnest_shadows.dart';
 
-class MainDetailCard extends StatelessWidget {
+class MainDetailCard extends ConsumerWidget {
   const MainDetailCard({super.key});
+
+  static const int stepGoal = 10000;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stepsAsync = ref.watch(todayStepsProvider);
+
+    return stepsAsync.when(
+      loading: () {
+        return const _MainDetailCardContent(steps: 0, isLoading: true);
+      },
+      error: (error, stackTrace) {
+        return const _MainDetailCardContent(steps: 0, isLoading: false);
+      },
+      data: (steps) {
+        return _MainDetailCardContent(steps: steps, isLoading: false);
+      },
+    );
+  }
+}
+
+class _MainDetailCardContent extends StatelessWidget {
+  const _MainDetailCardContent({required this.steps, required this.isLoading});
+
+  final int steps;
+  final bool isLoading;
+
+  static const int stepGoal = 10000;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
+    final progress = (steps / stepGoal).clamp(0.0, 1.0);
+    final percent = (progress * 100).round();
 
     return Container(
       width: double.infinity,
@@ -32,7 +65,7 @@ class MainDetailCard extends StatelessWidget {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
-                '8,240',
+                isLoading ? '...' : steps.toString(),
                 style: textTheme.displayLarge?.copyWith(
                   color: WellnestColors.activity,
                 ),
@@ -51,13 +84,13 @@ class MainDetailCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '8,240 / 10,000 steps',
+                '$steps / $stepGoal steps',
                 style: textTheme.labelSmall?.copyWith(
                   color: WellnestColors.onSurface,
                 ),
               ),
               Text(
-                '82%',
+                '$percent%',
                 style: textTheme.labelSmall?.copyWith(
                   color: WellnestColors.onSurface,
                 ),
@@ -68,7 +101,7 @@ class MainDetailCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(9999),
             child: LinearProgressIndicator(
-              value: 0.82,
+              value: progress,
               minHeight: 16,
               backgroundColor: WellnestColors.surfaceContainerHighest,
               valueColor: const AlwaysStoppedAnimation<Color>(

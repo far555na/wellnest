@@ -5,7 +5,7 @@ import 'package:wellnest/widgets/day_week_month_selector.dart';
 import 'package:wellnest/widgets/family_selector.dart';
 import 'package:wellnest/widgets/history_list.dart';
 import 'package:wellnest/widgets/insight_card.dart';
-import 'package:wellnest/widgets/main_detail_card.dart';
+import 'package:wellnest/widgets/health_detail/main_detail_card.dart';
 import 'package:wellnest/widgets/sub_detail_card.dart';
 import 'package:wellnest/widgets/trend_card.dart';
 
@@ -109,4 +109,3 @@ class StepsPage extends StatelessWidget {
     );
   }
 }
-
