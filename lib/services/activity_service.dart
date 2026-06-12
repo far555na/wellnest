@@ -9,6 +9,30 @@ class ActivityService extends HealthService {
     HealthDataType.SPEED,
   ];
 
+  DateTime _startOfDay(DateTime date) {
+    return DateTime(date.year, date.month, date.day);
+  }
+
+  DateTime _endOfDay(DateTime date) {
+    return DateTime(date.year, date.month, date.day, 23, 59, 59);
+  }
+
+  DateTime _safeEndOfDay(DateTime date) {
+    final now = DateTime.now();
+    final endOfDay = _endOfDay(date);
+
+    // If selected date is today, only fetch until now.
+    if (_isSameDay(date, now)) {
+      return now;
+    }
+
+    return endOfDay;
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
   Future<bool> initActivityService() async {
     return initHealth(types);
   }
@@ -27,40 +51,55 @@ class ActivityService extends HealthService {
 
     for (final point in data) {
       final date = point.dateFrom;
-
       datesWithData.add(DateTime(date.year, date.month, date.day));
     }
 
     return datesWithData;
   }
 
-  Future<int> getTodaySteps() async {
-    final steps = await health.getTotalStepsInInterval(startOfToday, now);
+  // -------------------------
+  // Steps
+  // -------------------------
 
-    return steps ?? 0;
+  Future<int> getStepsByDate(DateTime date) async {
+    final start = _startOfDay(date);
+    final end = _safeEndOfDay(date);
+
+    try {
+      final steps = await health.getTotalStepsInInterval(start, end);
+
+      return steps ?? 0;
+    } catch (error) {
+      debugPrint('Error getting steps by date: $error');
+      return 0;
+    }
   }
 
-  Future<List<double>> getTodayHourlySteps() async {
+  Future<int> getTodaySteps() async {
+    return getStepsByDate(DateTime.now());
+  }
+
+  // -------------------------
+  // Hourly Steps
+  // -------------------------
+
+  Future<List<double>> getHourlyStepsByDate(DateTime date) async {
     final List<double> hourlySteps = [];
 
-    // final currentNow = DateTime.now();
-    // final startOfToday = DateTime(
-    //   currentNow.year,
-    //   currentNow.month,
-    //   currentNow.day,
-    // );
+    final startOfSelectedDay = _startOfDay(date);
+    final now = DateTime.now();
 
     for (int hour = 0; hour < 24; hour++) {
-      final start = startOfToday.add(Duration(hours: hour));
-      final end = startOfToday.add(Duration(hours: hour + 1));
+      final start = startOfSelectedDay.add(Duration(hours: hour));
+      final end = startOfSelectedDay.add(Duration(hours: hour + 1));
 
-      // Do not fetch future hours
-      if (start.isAfter(now)) {
+      // Do not fetch future hours if selected date is today.
+      if (_isSameDay(date, now) && start.isAfter(now)) {
         hourlySteps.add(0);
         continue;
       }
 
-      final safeEnd = end.isAfter(now) ? now : end;
+      final safeEnd = _isSameDay(date, now) && end.isAfter(now) ? now : end;
 
       try {
         final steps = await health.getTotalStepsInInterval(start, safeEnd);
@@ -71,40 +110,73 @@ class ActivityService extends HealthService {
       }
     }
 
-    debugPrint('Hourly steps: $hourlySteps');
+    debugPrint('Hourly steps for $date: $hourlySteps');
 
     return hourlySteps;
   }
 
-  Future<double> getTodayDistanceKm() async {
-    final rawData = await health.getHealthDataFromTypes(
-      types: [HealthDataType.DISTANCE_DELTA],
-      startTime: startOfToday,
-      endTime: now,
-    );
-
-    final data = health.removeDuplicates(rawData);
-
-    double totalMeters = 0;
-
-    for (final point in data) {
-      final value = point.value;
-
-      if (value is NumericHealthValue) {
-        totalMeters += value.numericValue.toDouble();
-      }
-    }
-
-    return totalMeters / 1000;
+  Future<List<double>> getTodayHourlySteps() async {
+    return getHourlyStepsByDate(DateTime.now());
   }
 
-  Future<double> getTodayAverageSpeedKmh() async {
-    final distanceKm = await getTodayDistanceKm();
+  // -------------------------
+  // Distance
+  // -------------------------
 
-    final hours = now.difference(startOfToday).inMinutes / 60;
+  Future<double> getDistanceKmByDate(DateTime date) async {
+    final start = _startOfDay(date);
+    final end = _safeEndOfDay(date);
+
+    try {
+      final rawData = await health.getHealthDataFromTypes(
+        types: [HealthDataType.DISTANCE_DELTA],
+        startTime: start,
+        endTime: end,
+      );
+
+      final data = health.removeDuplicates(rawData);
+
+      double totalMeters = 0;
+
+      for (final point in data) {
+        final value = point.value;
+
+        if (value is NumericHealthValue) {
+          totalMeters += value.numericValue.toDouble();
+        }
+      }
+
+      final distanceKm = totalMeters / 1000;
+
+      return distanceKm;
+    } catch (error) {
+      debugPrint('Error getting distance by date: $error');
+      return 0;
+    }
+  }
+
+  Future<double> getTodayDistanceKm() async {
+    return getDistanceKmByDate(DateTime.now());
+  }
+
+  // -------------------------
+  // Average Speed
+  // -------------------------
+
+  Future<double> getAverageSpeedKmhByDate(DateTime date) async {
+    final distanceKm = await getDistanceKmByDate(date);
+
+    final start = _startOfDay(date);
+    final end = _safeEndOfDay(date);
+
+    final hours = end.difference(start).inMinutes / 60;
 
     if (hours <= 0) return 0;
 
     return distanceKm / hours;
+  }
+
+  Future<double> getTodayAverageSpeedKmh() async {
+    return getAverageSpeedKmhByDate(DateTime.now());
   }
 }

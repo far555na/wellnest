@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wellnest/providers/activity_service_provider.dart';
+import 'package:wellnest/providers/selected_date_provider.dart';
 import 'package:wellnest/theme/wellnest_color.dart';
 import 'package:wellnest/theme/wellnest_spacing.dart';
 import 'package:wellnest/widgets/day_week_month_selector.dart';
@@ -18,11 +19,13 @@ class StepsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
+    
+    final selectedDate = ref.watch(selectedDateProvider);
 
-    final stepsAsync = ref.watch(todayStepsProvider);
-    final distanceAsync = ref.watch(todayDistanceProvider);
-    final avgSpeedAsync = ref.watch(todayAverageSpeedProvider);
-    final hourlyStepsAsync = ref.watch(todayHourlyStepsProvider);
+    final stepsAsync = ref.watch(stepsProvider(selectedDate));
+    final distanceAsync = ref.watch(distanceProvider(selectedDate));
+    final avgSpeedAsync = ref.watch(averageSpeedProvider(selectedDate));
+    final hourlyStepsAsync = ref.watch(hourlyStepsProvider(selectedDate));
 
     final stepsValue = stepsAsync.when(
       data: (steps) => steps,
@@ -75,9 +78,7 @@ class StepsPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: const DatePickerTitle(),
-            ),
+            Center(child: const DatePickerTitle()),
             const SizedBox(height: WellnestSpacing.sm),
 
             // Time filter Segmented Control

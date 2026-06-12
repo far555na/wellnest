@@ -27,10 +27,55 @@ Future<T> _withActivityPermission<T>(
 
 final datesWithStepDataProvider =
     FutureProvider.family<Set<DateTime>, DateTime>((ref, month) async {
-  final activityService = ref.read(activityServiceProvider);
-
-  return activityService.getDatesWithStepData(month: month);
+  return _withActivityPermission<Set<DateTime>>(
+    ref,
+    fallback: <DateTime>{},
+    action: (service) => service.getDatesWithStepData(month: month),
+  );
 });
+
+// -------------------------
+// Date-based providers
+// -------------------------
+
+final stepsProvider = FutureProvider.family<int, DateTime>((ref, date) {
+  return _withActivityPermission<int>(
+    ref,
+    fallback: 0,
+    action: (service) => service.getStepsByDate(date),
+  );
+});
+
+final hourlyStepsProvider =
+    FutureProvider.family<List<double>, DateTime>((ref, date) {
+  return _withActivityPermission<List<double>>(
+    ref,
+    fallback: List<double>.filled(24, 0),
+    action: (service) => service.getHourlyStepsByDate(date),
+  );
+});
+
+final distanceProvider = FutureProvider.family<double, DateTime>((ref, date) {
+  return _withActivityPermission<double>(
+    ref,
+    fallback: 0,
+    action: (service) => service.getDistanceKmByDate(date),
+  );
+});
+
+final averageSpeedProvider =
+    FutureProvider.family<double, DateTime>((ref, date) {
+  return _withActivityPermission<double>(
+    ref,
+    fallback: 0,
+    action: (service) => service.getAverageSpeedKmhByDate(date),
+  );
+});
+
+// -------------------------
+// Optional old today providers
+// Keep these if other pages still use them
+// -------------------------
 
 final todayStepsProvider = FutureProvider<int>((ref) {
   return _withActivityPermission<int>(
@@ -40,9 +85,12 @@ final todayStepsProvider = FutureProvider<int>((ref) {
   );
 });
 
-final todayHourlyStepsProvider = FutureProvider<List<double>>((ref) async {
-  final service = ref.watch(activityServiceProvider);
-  return service.getTodayHourlySteps();
+final todayHourlyStepsProvider = FutureProvider<List<double>>((ref) {
+  return _withActivityPermission<List<double>>(
+    ref,
+    fallback: List<double>.filled(24, 0),
+    action: (service) => service.getTodayHourlySteps(),
+  );
 });
 
 final todayDistanceProvider = FutureProvider<double>((ref) {

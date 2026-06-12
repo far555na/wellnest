@@ -127,7 +127,7 @@ class TrendCard extends StatelessWidget {
                             text = '18:00';
                             break;
                           case 23:
-                            text = ':23:00';
+                            text = '23:00';
                             break;
                         }
 
