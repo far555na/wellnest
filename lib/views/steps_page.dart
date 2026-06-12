@@ -9,7 +9,7 @@ import 'package:wellnest/widgets/history_list.dart';
 import 'package:wellnest/widgets/insight_card.dart';
 import 'package:wellnest/widgets/health_detail/main_detail_card.dart';
 import 'package:wellnest/widgets/health_detail/sub_detail_card.dart';
-import 'package:wellnest/widgets/trend_card.dart';
+import 'package:wellnest/widgets/health_detail/trend_card.dart';
 
 class StepsPage extends ConsumerWidget {
   const StepsPage({super.key});
@@ -21,6 +21,7 @@ class StepsPage extends ConsumerWidget {
     final stepsAsync = ref.watch(todayStepsProvider);
     final distanceAsync = ref.watch(todayDistanceProvider);
     final avgSpeedAsync = ref.watch(todayAverageSpeedProvider);
+    final hourlyStepsAsync = ref.watch(todayHourlyStepsProvider);
 
     final stepsValue = stepsAsync.when(
       data: (steps) => steps,
@@ -120,7 +121,20 @@ class StepsPage extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Steps Trend Chart Card
-            const TrendCard(),
+            hourlyStepsAsync.when(
+              data: (hourlySteps) {
+                return TrendCard(hourlySteps: hourlySteps);
+              },
+              loading: () {
+                return const SizedBox(
+                  height: 220,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              },
+              error: (error, stackTrace) {
+                return TrendCard(hourlySteps: List.filled(24, 0));
+              },
+            ),
             const SizedBox(height: 24),
 
             // Wellnest Insight Card

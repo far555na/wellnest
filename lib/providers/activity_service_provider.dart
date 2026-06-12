@@ -33,6 +33,11 @@ final todayStepsProvider = FutureProvider<int>((ref) {
   );
 });
 
+final todayHourlyStepsProvider = FutureProvider<List<double>>((ref) async {
+  final service = ref.watch(activityServiceProvider);
+  return service.getTodayHourlySteps();
+});
+
 final todayDistanceProvider = FutureProvider<double>((ref) {
   return _withActivityPermission<double>(
     ref,
