@@ -5,6 +5,7 @@ import 'package:wellnest/theme/wellnest_color.dart';
 import 'package:wellnest/theme/wellnest_spacing.dart';
 import 'package:wellnest/widgets/day_week_month_selector.dart';
 import 'package:wellnest/widgets/family_selector.dart';
+import 'package:wellnest/widgets/health_detail/date_picker_title.dart';
 import 'package:wellnest/widgets/history_list.dart';
 import 'package:wellnest/widgets/insight_card.dart';
 import 'package:wellnest/widgets/health_detail/main_detail_card.dart';
@@ -75,12 +76,7 @@ class StepsPage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: Text(
-                'Today, May 29',
-                style: textTheme.labelMedium?.copyWith(
-                  color: WellnestColors.onSurface,
-                ),
-              ),
+              child: const DatePickerTitle(),
             ),
             const SizedBox(height: WellnestSpacing.sm),
 
