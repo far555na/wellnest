@@ -1,34 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wellnest/providers/activity_service_provider.dart';
 import 'package:wellnest/theme/wellnest_color.dart';
 import 'package:wellnest/theme/wellnest_shadows.dart';
 
-class MainDetailCard extends ConsumerWidget {
-  const MainDetailCard({super.key});
-
-  static const int stepGoal = 10000;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final stepsAsync = ref.watch(todayStepsProvider);
-
-    return stepsAsync.when(
-      loading: () {
-        return const _MainDetailCardContent(steps: 0, isLoading: true);
-      },
-      error: (error, stackTrace) {
-        return const _MainDetailCardContent(steps: 0, isLoading: false);
-      },
-      data: (steps) {
-        return _MainDetailCardContent(steps: steps, isLoading: false);
-      },
-    );
-  }
-}
-
-class _MainDetailCardContent extends StatelessWidget {
-  const _MainDetailCardContent({required this.steps, required this.isLoading});
+class MainDetailCard extends StatelessWidget {
+  const MainDetailCard({
+    super.key,
+    required this.steps,
+    this.isLoading = false,
+  });
 
   final int steps;
   final bool isLoading;

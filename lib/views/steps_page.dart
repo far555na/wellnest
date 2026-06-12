@@ -17,9 +17,18 @@ class StepsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
-    
+
+    final stepsAsync = ref.watch(todayStepsProvider);
     final distanceAsync = ref.watch(todayDistanceProvider);
     final avgSpeedAsync = ref.watch(todayAverageSpeedProvider);
+
+    final stepsValue = stepsAsync.when(
+      data: (steps) => steps,
+      loading: () => 0,
+      error: (_, __) => 0,
+    );
+
+    final isStepsLoading = stepsAsync.isLoading;
 
     final distanceValue = distanceAsync.when(
       data: (distance) => distance.toStringAsFixed(1),
@@ -83,7 +92,7 @@ class StepsPage extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Total Steps Summary Card
-            const MainDetailCard(),
+            MainDetailCard(steps: stepsValue, isLoading: isStepsLoading),
             const SizedBox(height: 24),
 
             // Distance and Avg Speed Split Row
