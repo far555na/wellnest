@@ -25,6 +25,13 @@ Future<T> _withActivityPermission<T>(
   return action(service);
 }
 
+final datesWithStepDataProvider =
+    FutureProvider.family<Set<DateTime>, DateTime>((ref, month) async {
+  final activityService = ref.read(activityServiceProvider);
+
+  return activityService.getDatesWithStepData(month: month);
+});
+
 final todayStepsProvider = FutureProvider<int>((ref) {
   return _withActivityPermission<int>(
     ref,

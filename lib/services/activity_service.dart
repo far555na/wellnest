@@ -9,76 +9,94 @@ class ActivityService extends HealthService {
     HealthDataType.SPEED,
   ];
 
- Future<bool> initActivityService() async {
+  Future<bool> initActivityService() async {
     return initHealth(types);
   }
 
-  Future<int> getTodaySteps() async {
-    final steps = await health.getTotalStepsInInterval(
-      startOfToday,
-      now,
+  Future<Set<DateTime>> getDatesWithStepData({required DateTime month}) async {
+    final startOfMonth = DateTime(month.year, month.month, 1);
+    final endOfMonth = DateTime(month.year, month.month + 1, 1);
+
+    final data = await health.getHealthDataFromTypes(
+      types: [HealthDataType.STEPS],
+      startTime: startOfMonth,
+      endTime: endOfMonth,
     );
+
+    final datesWithData = <DateTime>{};
+
+    for (final point in data) {
+      final date = point.dateFrom;
+
+      datesWithData.add(DateTime(date.year, date.month, date.day));
+    }
+
+    return datesWithData;
+  }
+
+  Future<int> getTodaySteps() async {
+    final steps = await health.getTotalStepsInInterval(startOfToday, now);
 
     return steps ?? 0;
   }
 
   Future<List<double>> getTodayHourlySteps() async {
-  final List<double> hourlySteps = [];
+    final List<double> hourlySteps = [];
 
-  // final currentNow = DateTime.now();
-  // final startOfToday = DateTime(
-  //   currentNow.year,
-  //   currentNow.month,
-  //   currentNow.day,
-  // );
+    // final currentNow = DateTime.now();
+    // final startOfToday = DateTime(
+    //   currentNow.year,
+    //   currentNow.month,
+    //   currentNow.day,
+    // );
 
-  for (int hour = 0; hour < 24; hour++) {
-    final start = startOfToday.add(Duration(hours: hour));
-    final end = startOfToday.add(Duration(hours: hour + 1));
+    for (int hour = 0; hour < 24; hour++) {
+      final start = startOfToday.add(Duration(hours: hour));
+      final end = startOfToday.add(Duration(hours: hour + 1));
 
-    // Do not fetch future hours
-    if (start.isAfter(now)) {
-      hourlySteps.add(0);
-      continue;
+      // Do not fetch future hours
+      if (start.isAfter(now)) {
+        hourlySteps.add(0);
+        continue;
+      }
+
+      final safeEnd = end.isAfter(now) ? now : end;
+
+      try {
+        final steps = await health.getTotalStepsInInterval(start, safeEnd);
+        hourlySteps.add((steps ?? 0).toDouble());
+      } catch (error) {
+        debugPrint('Error getting steps for hour $hour: $error');
+        hourlySteps.add(0);
+      }
     }
 
-    final safeEnd = end.isAfter(now) ? now : end;
+    debugPrint('Hourly steps: $hourlySteps');
 
-    try {
-      final steps = await health.getTotalStepsInInterval(start, safeEnd);
-      hourlySteps.add((steps ?? 0).toDouble());
-    } catch (error) {
-      debugPrint('Error getting steps for hour $hour: $error');
-      hourlySteps.add(0);
-    }
+    return hourlySteps;
   }
-
-  debugPrint('Hourly steps: $hourlySteps');
-
-  return hourlySteps;
-}
 
   Future<double> getTodayDistanceKm() async {
-  final rawData = await health.getHealthDataFromTypes(
-    types: [HealthDataType.DISTANCE_DELTA],
-    startTime: startOfToday,
-    endTime: now,
-  );
+    final rawData = await health.getHealthDataFromTypes(
+      types: [HealthDataType.DISTANCE_DELTA],
+      startTime: startOfToday,
+      endTime: now,
+    );
 
-  final data = health.removeDuplicates(rawData);
+    final data = health.removeDuplicates(rawData);
 
-  double totalMeters = 0;
+    double totalMeters = 0;
 
-  for (final point in data) {
-    final value = point.value;
+    for (final point in data) {
+      final value = point.value;
 
-    if (value is NumericHealthValue) {
-      totalMeters += value.numericValue.toDouble();
+      if (value is NumericHealthValue) {
+        totalMeters += value.numericValue.toDouble();
+      }
     }
-  }
 
-  return totalMeters / 1000;
-}
+    return totalMeters / 1000;
+  }
 
   Future<double> getTodayAverageSpeedKmh() async {
     final distanceKm = await getTodayDistanceKm();

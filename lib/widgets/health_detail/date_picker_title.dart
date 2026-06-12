@@ -1,107 +1,110 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:wellnest/providers/activity_service_provider.dart';
 import 'package:wellnest/providers/selected_date_provider.dart';
 import 'package:wellnest/theme/wellnest_color.dart';
 
 class DatePickerTitle extends ConsumerWidget {
   const DatePickerTitle({super.key});
 
-Future<void> _pickDate(BuildContext context, WidgetRef ref) async {
-  final selectedDate = ref.read(selectedDateProvider);
+  Future<void> _pickDate(BuildContext context, WidgetRef ref) async {
+    final selectedDate = ref.read(selectedDateProvider);
 
-  // Example dates that have data
-  final datesWithData = <DateTime>{
-    DateTime(2026, 6, 10),
-    DateTime(2026, 6, 11),
-    DateTime(2026, 6, 12),
-  };
+    Future<Set<DateTime>> loadDatesWithData(DateTime month) {
+      return ref.read(datesWithStepDataProvider(month).future);
+    }
 
-  bool hasData(DateTime day) {
-    return datesWithData.any(
-      (date) =>
-          date.year == day.year &&
-          date.month == day.month &&
-          date.day == day.day,
-    );
-  }
+    bool hasData(DateTime day, Set<DateTime> datesWithData) {
+      return datesWithData.contains(DateTime(day.year, day.month, day.day));
+    }
 
-  final pickedDate = await showDialog<DateTime>(
-    context: context,
-    builder: (context) {
-      DateTime tempSelectedDate = selectedDate;
-      DateTime focusedDay = selectedDate;
+    final pickedDate = await showDialog<DateTime>(
+      context: context,
+      builder: (context) {
+        DateTime tempSelectedDate = selectedDate;
+        DateTime focusedDay = selectedDate;
 
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        contentPadding: const EdgeInsets.all(16),
-        content: StatefulBuilder(
-          builder: (context, setState) {
-            return SizedBox(
-              width: double.maxFinite,
-              child: TableCalendar(
-                firstDay: DateTime(2020),
-                lastDay: DateTime.now(),
-                focusedDay: focusedDay,
-                selectedDayPredicate: (day) {
-                  return isSameDay(tempSelectedDate, day);
-                },
-                onDaySelected: (selectedDay, newFocusedDay) {
-                  setState(() {
-                    tempSelectedDate = selectedDay;
-                    focusedDay = newFocusedDay;
-                  });
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          contentPadding: const EdgeInsets.all(16),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return SizedBox(
+                width: double.maxFinite,
+                child: FutureBuilder<Set<DateTime>>(
+                  future: loadDatesWithData(focusedDay),
+                  builder: (context, snapshot) {
+                    final datesWithData = snapshot.data ?? {};
 
-                  Navigator.pop(context, selectedDay);
-                },
-                calendarBuilders: CalendarBuilders(
-                  markerBuilder: (context, day, events) {
-                    if (!hasData(day)) return null;
+                    return TableCalendar(
+                      firstDay: DateTime(2020),
+                      lastDay: DateTime.now(),
+                      focusedDay: focusedDay,
+                      selectedDayPredicate: (day) {
+                        return isSameDay(tempSelectedDate, day);
+                      },
+                      onPageChanged: (newFocusedDay) {
+                        setState(() {
+                          focusedDay = newFocusedDay;
+                        });
+                      },
+                      onDaySelected: (selectedDay, newFocusedDay) {
+                        setState(() {
+                          tempSelectedDate = selectedDay;
+                          focusedDay = newFocusedDay;
+                        });
 
-                    return Positioned(
-                      bottom: 6,
-                      child: Container(
-                        width: 5,
-                        height: 5,
-                        decoration: BoxDecoration(
+                        Navigator.pop(context, selectedDay);
+                      },
+                      calendarBuilders: CalendarBuilders(
+                        markerBuilder: (context, day, events) {
+                          if (!hasData(day, datesWithData)) return null;
+
+                          return Positioned(
+                            bottom: 6,
+                            child: Container(
+                              width: 5,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: WellnestColors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      headerStyle: const HeaderStyle(
+                        formatButtonVisible: false,
+                        titleCentered: true,
+                      ),
+                      calendarStyle: CalendarStyle(
+                        todayDecoration: BoxDecoration(
+                          color: WellnestColors.primary.withOpacity(0.18),
+                          shape: BoxShape.circle,
+                        ),
+                        selectedDecoration: BoxDecoration(
                           color: WellnestColors.primary,
                           shape: BoxShape.circle,
                         ),
+                        selectedTextStyle: const TextStyle(color: Colors.white),
                       ),
                     );
                   },
                 ),
-                headerStyle: const HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                ),
-                calendarStyle: CalendarStyle(
-                  todayDecoration: BoxDecoration(
-                    color: WellnestColors.primary.withOpacity(0.18),
-                    shape: BoxShape.circle,
-                  ),
-                  selectedDecoration: BoxDecoration(
-                    color: WellnestColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  selectedTextStyle: const TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      );
-    },
-  );
+              );
+            },
+          ),
+        );
+      },
+    );
 
-  if (pickedDate != null) {
-    ref.read(selectedDateProvider.notifier).setDate(pickedDate);
+    if (pickedDate != null) {
+      ref.read(selectedDateProvider.notifier).setDate(pickedDate);
+    }
   }
-}
 
   String _formatDate(DateTime date) {
     const months = [
