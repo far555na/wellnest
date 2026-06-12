@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wellnest/theme/wellnest_theme.dart';
 import 'package:wellnest/services/health_service.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:wellnest/views/dashboard_page.dart';
 import 'package:wellnest/views/steps_page.dart';
 import 'firebase_options.dart';
 
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Wellnest',
       debugShowCheckedModeBanner: false,
       theme: WellnestTheme.lightTheme,
-      home: StepsPage(),
+      home: DashboardPage(),
     );
   }
 }
