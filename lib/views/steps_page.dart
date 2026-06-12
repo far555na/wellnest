@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wellnest/providers/activity_service_provider.dart';
 import 'package:wellnest/theme/wellnest_color.dart';
 import 'package:wellnest/theme/wellnest_spacing.dart';
 import 'package:wellnest/widgets/day_week_month_selector.dart';
@@ -6,15 +8,30 @@ import 'package:wellnest/widgets/family_selector.dart';
 import 'package:wellnest/widgets/history_list.dart';
 import 'package:wellnest/widgets/insight_card.dart';
 import 'package:wellnest/widgets/health_detail/main_detail_card.dart';
-import 'package:wellnest/widgets/sub_detail_card.dart';
+import 'package:wellnest/widgets/health_detail/sub_detail_card.dart';
 import 'package:wellnest/widgets/trend_card.dart';
 
-class StepsPage extends StatelessWidget {
+class StepsPage extends ConsumerWidget {
   const StepsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
+    
+    final distanceAsync = ref.watch(todayDistanceProvider);
+    final avgSpeedAsync = ref.watch(todayAverageSpeedProvider);
+
+    final distanceValue = distanceAsync.when(
+      data: (distance) => distance.toStringAsFixed(1),
+      loading: () => '--',
+      error: (_, __) => '0.0',
+    );
+
+    final avgSpeedValue = avgSpeedAsync.when(
+      data: (speed) => speed.toStringAsFixed(1),
+      loading: () => '--',
+      error: (_, __) => '0.0',
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -70,22 +87,22 @@ class StepsPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Distance and Avg Speed Split Row
-            const Row(
+            Row(
               children: [
                 Expanded(
                   child: SubDetailCard(
                     icon: Icons.location_on_outlined,
                     label: 'Distance',
-                    value: '5.4',
+                    value: distanceValue,
                     unit: 'km',
                   ),
                 ),
-                SizedBox(width: WellnestSpacing.sm),
+                const SizedBox(width: WellnestSpacing.sm),
                 Expanded(
                   child: SubDetailCard(
                     icon: Icons.speed_outlined,
                     label: 'Avg Speed',
-                    value: '4.8',
+                    value: avgSpeedValue,
                     unit: 'km/h',
                   ),
                 ),

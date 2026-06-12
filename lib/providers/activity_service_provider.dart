@@ -5,18 +5,18 @@ final activityServiceProvider = Provider<ActivityService>((ref) {
   return ActivityService();
 });
 
-final stepPermissionProvider = FutureProvider<bool>((ref) async {
+final activityPermissionProvider = FutureProvider<bool>((ref) async {
   final service = ref.read(activityServiceProvider);
-  return service.initStepService();
+  return service.initActivityService();
 });
 
-Future<T> _withStepPermission<T>(
+Future<T> _withActivityPermission<T>(
   Ref ref, {
   required T fallback,
   required Future<T> Function(ActivityService service) action,
 }) async {
   final service = ref.read(activityServiceProvider);
-  final granted = await ref.watch(stepPermissionProvider.future);
+  final granted = await ref.watch(activityPermissionProvider.future);
 
   if (!granted) {
     return fallback;
@@ -26,9 +26,25 @@ Future<T> _withStepPermission<T>(
 }
 
 final todayStepsProvider = FutureProvider<int>((ref) {
-  return _withStepPermission<int>(
+  return _withActivityPermission<int>(
     ref,
     fallback: 0,
     action: (service) => service.getTodaySteps(),
+  );
+});
+
+final todayDistanceProvider = FutureProvider<double>((ref) {
+  return _withActivityPermission<double>(
+    ref,
+    fallback: 0,
+    action: (service) => service.getTodayDistanceKm(),
+  );
+});
+
+final todayAverageSpeedProvider = FutureProvider<double>((ref) {
+  return _withActivityPermission<double>(
+    ref,
+    fallback: 0,
+    action: (service) => service.getTodayAverageSpeedKmh(),
   );
 });
